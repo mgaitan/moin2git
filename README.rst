@@ -168,8 +168,8 @@ pygit2_, wich probably is the faster one (because it's based on libgit2_ library
 
 
 
-.. [1]: http://python.org.ar/AlejandroJCura/ClassDec%C3%B3
-.. [2]: Note we should parse the ugly escaping. ``(2f)`` is ``/`` and determines the left part is a directory. ``(c3b3)`` means ``%C3%B3``, i.e. ``ó``
+.. [1] http://python.org.ar/AlejandroJCura/ClassDec%C3%B3
+.. [2] Note we should parse the ugly escaping. ``(2f)`` is ``/`` and determines the left part is a directory. ``(c3b3)`` means ``%C3%B3``, i.e. ``ó``
 
 .. _MoinMoin: http://moinmo.in/
 .. _moin must die: Muerte_a_Moin_Moin_.2BAC8ALw_django-waliki_.3F
