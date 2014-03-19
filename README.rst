@@ -78,7 +78,7 @@ An overview of the structure of this tree is this::
 (In advance) autopsy
 --------------------
 
-- Each wiki page (no matter how *deep* be its url) is stored in a directory
+- Each wiki page (no matter how *deep* its url be) is stored in a directory
   ``/data/pages/<URL>``. For example in our example the url
   ``/AlejandroJCura/ClassDec%C3%B3`` [1]_ is ``data/pages/AlejandroJCura(2f)ClassDec(c3b3)``
 
