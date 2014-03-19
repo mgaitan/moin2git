@@ -150,21 +150,21 @@ Solving the puzzle
 We will use git to handle the *history*, so don't need files to track
 revision nor users: just pages.
 
-For instance, in the root of our target directory (the git repo) we should
+For instance,  in the root of our target directory (the git repo) we should
 get a file ``AlejandroJCura``:
 
- - 3 revisions (commits), from revisions/00001 until 0003)
- - the committer name/nickname and email (if available) will parsed from the user file of each revision. To know who do what revision, we will parse the ``edit-log`` file.
- - The date of each commit will be extracted from the date of each file.
+ - 3 revisions (commits), from ``revisions/00000001`` until ``revisions/00000003``
+ - the committer name/nickname and email (if available) will be parsed from the user file of each revision. To know who do what revision, we will parse the ``edit-log`` file.
+ - The date of each commit will be extracted from the last-modified date of each revision file.
 
-We also get a file ``AlejandroJCura/ClassDecó`` [2]_ where, in this case, ``AlejandroJCura/`` is a directory.
+We should also get a file ``AlejandroJCura/ClassDecó`` [2]_ where, in this case, ``AlejandroJCura/`` is a directory.
 
 
 What to use
 -------------
 
 There are many python wrappers for git libraries. The most promoted is
-pygit2_, wich probably is the faster one (because it's based on libgit2_ library). However, I choose GitPython_ for Waliki_ because it has a higher level API and a pretty useful fallback to git's executables (wrappers via subprocess) for the deep and obscure corners.
+pygit2_, wich probably is the faster one (because it's based on libgit2_ library). However, I choose GitPython_ for Waliki_ because it has a higher level API and a pretty useful fallback to git's executables (wrappers via subprocess) for the those deep and obscure corners.
 
 
 
