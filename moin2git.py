@@ -75,51 +75,57 @@ def get_versions(page, users=None, data_dir=None):
             continue
 
         date = datetime.fromtimestamp(int(entry[0][:-6]))
-        comment = entry[-1]
-        email = users.get(entry[-3], {}).get('email', '')
+        comment = entry[-1] or 'Update %s' % entry[1]
+        email = users.get(entry[-3], {}).get('email', 'an@nymous.com')
         # look for name, username. default to IP
-        name = users.get(entry[-3], {}).get('name', None) or users.get(entry[-3], {}).get('username', '')
+        name = users.get(entry[-3], {}).get('name', None) or users.get(entry[-3], {}).get('username', entry[-5])
 
-        versions.append({'date': date, 'content': content, 'email': email, 'name': name or entry[-5]})
+        versions.append({'date': date, 'content': content,
+                         'author': "%s <%s>" % (name, email),
+                         'comment': comment,
+                         'revision': entry[1]})
 
     return versions
 
 
 def main():
     users = parse_users()
-
-
     git_repo = arguments['<git_repo>']
+
     if not os.path.exists(git_repo):
         os.makedirs(git_repo)
-
     if not os.path.exists(os.path.join(git_repo, '.git')):
         git.init(git_repo)
 
     root = os.path.join(arguments['<data_dir>'], 'pages')
     pages = os.listdir(root)
-
-
+    os.chdir(git_repo)
     for page in pages:
-        path = _unquote(page)
+        versions = get_versions(page, users=users)
+        if not versions:
+            print "### ignoring %s (no revisions found)" % page
+            continue
+        path = _unquote(page) + '.rst'
+        print "### Creating %s\n" % path
         dirname, basename = os.path.split(path)
-        basename += '.rst'
-        if not os.path.exists(dirname):
+        if dirname and not os.path.exists(dirname):
             os.makedirs(dirname)
 
-        versions_path = os.path.join(root, page, 'versions')
-        versions = os.listdir(versions_path)
         for version in versions:
-            pass
-
-
+            print "revision", version['revision']
+            with open(path, 'w') as f:
+                f.write(version['content'])
+            try:
+                git.add(path)
+                git.commit(path, author=version['author'], date=version['date'].isoformat(), m=version['comment'])
+            except:
+                pass
 
 if __name__ == '__main__':
 
     arguments = docopt.docopt(__doc__, version=__version__)
 
-
     if arguments['--users']:
         print json.dumps(parse_users(), sort_keys=True, indent=2)
     else:
-        print(arguments)
+        main()
