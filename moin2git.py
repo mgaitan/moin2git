@@ -18,7 +18,7 @@ Options:
     --users         Dump users database as json
     --convert       After migrate, convert to reStructuredText
 """
-from sh import git
+from sh import git, python
 import docopt
 import os
 import re
@@ -27,6 +27,8 @@ from datetime import datetime
 from urllib2 import unquote
 
 __version__ = "0.1"
+PACKAGE_ROOT = os.path.abspath(os.path.dirname(__file__))
+
 
 def _unquote(encoded):
     """
@@ -51,7 +53,7 @@ def parse_users(data_dir=None):
     return users
 
 
-def get_versions(page, users=None, data_dir=None):
+def get_versions(page, users=None, data_dir=None, convert=False):
     if not data_dir:
         data_dir = arguments['<data_dir>']
     if not users:
@@ -75,16 +77,28 @@ def get_versions(page, users=None, data_dir=None):
             continue
 
         date = datetime.fromtimestamp(int(entry[0][:-6]))
-        comment = entry[-1] or 'Update %s' % entry[1]
+        comment = entry[-1]
         email = users.get(entry[-3], {}).get('email', 'an@nymous.com')
         # look for name, username. default to IP
         name = users.get(entry[-3], {}).get('name', None) or users.get(entry[-3], {}).get('username', entry[-5])
 
         versions.append({'date': date, 'content': content,
                          'author': "%s <%s>" % (name, email),
-                         'comment': comment,
+                         'm': comment,
                          'revision': entry[1]})
+    if not convert:
+        try:
+            convert = arguments['--convert']
+        except NameError:
+            convert = False
 
+    if convert:
+        conversor = os.path.join(PACKAGE_ROOT, "moin2rst", "moin2rst.py")
+        basedir = os.path.abspath(os.path.join(data_dir, '..', '..'))
+        rst = python(conversor, _unquote(page), d=basedir)
+        versions.append({'m': 'Converted to reStructuredText via moin2rst',
+                         'content': rst.stdout,
+                         'revision': 'Converting to rst'})
     return versions
 
 
@@ -112,12 +126,12 @@ def main():
             os.makedirs(dirname)
 
         for version in versions:
-            print "revision", version['revision']
+            print "revision", version.pop('revision')
             with open(path, 'w') as f:
-                f.write(version['content'])
+                f.write(version.pop('content'))
             try:
                 git.add(path)
-                git.commit(path, author=version['author'], date=version['date'].isoformat(), m=version['comment'])
+                git.commit(path, allow_empty_message=True, **version)
             except:
                 pass
 

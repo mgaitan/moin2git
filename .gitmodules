@@ -1,0 +1,3 @@
+[submodule "moin2rst"]
+	path = moin2rst
+	url = https://github.com/astraw/moin2rst.git
