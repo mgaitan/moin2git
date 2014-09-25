@@ -106,7 +106,7 @@ An overview of the structure of this tree is this::
 
   The data logged is (in this order):
 
-    ``EDITION_ID``, ``REVISION``, ``ACTION``, ``PAGE``, ``IP``, ``HOST``, ``USER_ID``, ``LOG_MESSAGE``
+    ``DATE``, ``REVISION``, ``ACTION``, ``PAGE``, ``IP``, ``HOST``, ``USER_ID``, ``ATTACHMENTS``, ``LOG_MESSAGE``
 
 - The ``USER_ID`` point to a file under the directory ``/data/user`` contained a lot of information related to the user. For example:
 
