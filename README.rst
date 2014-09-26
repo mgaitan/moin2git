@@ -2,11 +2,12 @@ moin2git
 ========
 
 A tool to migrate the content of a MoinMoin wiki to a Git backed wiki engine
-like Waliki_, Gollum_, Realms_ or similar.
+like Gollum_, Realms_, Waliki_  or similar.
 
-.. _Waliki: https://github.com/mgaitan/waliki
+
 .. _Gollum: https://github.com/gollum/gollum
 .. _Realms: https://github.com/scragg0x/realms-wiki
+.. _Waliki: https://github.com/mgaitan/waliki
 
 
 Install
@@ -202,4 +203,3 @@ We should also get a file ``AlejandroJCura/ClassDecó`` [2]_ where, in this case
 .. _MoinMoin: http://moinmo.in/
 .. _sh: http://amoffat.github.io/sh
 .. _moin must die: Muerte_a_Moin_Moin_.2BAC8ALw_django-waliki_.3F
-.. _Waliki: https://github.com/mgaitan/waliki/
