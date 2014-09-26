@@ -1,11 +1,44 @@
 moin2git
 ========
 
-A tool to migrate a MoinMoin wiki as a Git repository.
+A tool to migrate the content of a MoinMoin wiki to a Git backed wiki engine
+like Waliki_, Gollum_, Realms_ or similar.
 
-Hopefully to be done and used at the `PyCamp <2014 http://python.org.ar/PyCamp/2014>`_ to migrate the `website of Python Argentina <http://python.org.ar/>`_  (because... `moin must die`_).
+.. _Waliki: https://github.com/mgaitan/waliki
+.. _Gollum: https://github.com/gollum/gollum
+.. _Realms: https://github.com/scragg0x/realms-wiki
 
-.. attention:: there is nothing but info and ideas, yet
+
+Install
+-------
+
+::
+    git clone --recursive https://github.com/mgaitan/moin2git.git
+    [sudo] pip install -r requirements.txt
+
+Usage
+-----
+
+::
+
+    tin@morochita:~$ python moin2git.py --help
+    moin2git.py
+
+    A tool to migrate the content of a MoinMoin wiki to a Git based system
+    like Waliki, Gollum or similar.
+
+    Usage:
+      moin2git.py migrate <data_dir> <git_repo> [--convert-to-rst]
+      moin2git.py users <data_dir>
+      moin2git.py attachments <data_dir> <dest_dir>
+
+    Arguments:
+        data_dir  Path where your MoinMoin content is
+        git_repo  Path to the target repo (created if it doesn't exist)
+        dest_dir  Path to copy attachments (created if it doesn't exist)
+
+    Options:
+        --convert-to-rst    After migrate, convert to reStructuredText
 
 
 Dive in
@@ -34,8 +67,6 @@ An overview of the structure of this tree is this::
     │   │   └── revisions
     │   │       ├── 00000001
     │   │       ├── 00000002
-    │   │       ├── 00000003
-    │   │       ├── 00000004
     │   │
     │   ├── AlejandroJCura
     │   │   ├── cache
@@ -71,20 +102,16 @@ An overview of the structure of this tree is this::
         ├── 1138297101.79.62731
         ├── 1138912320.61.21990
         ├── 1138912840.93.11353
-        ├── 1140549890.71.33402
-        ├── 1140635789.97.15153
         ...
 
-(In advance) autopsy
---------------------
+
 
 - Each wiki page (no matter how *deep* its url be) is stored in a directory
   ``/data/pages/<URL>``. For example in our example the url
   ``/AlejandroJCura/ClassDec%C3%B3`` [1]_ is ``data/pages/AlejandroJCura(2f)ClassDec(c3b3)``
 
 - The content itself is in the directory ``/revisions``, describing
-  the history of a page. Each file in this directory is a full version of a the page (not a diff). The date of last modification of each file,
-  is the revision date.
+  the history of a page. Each file in this directory is a full version of a the page (not a diff).
 
 - The file ``/data/pages/<URL>/current`` works as a pointer to the current
   revision (in general, the more recent one, but a page could be "restored" to an older revision). For example:
@@ -104,9 +131,9 @@ An overview of the structure of this tree is this::
         1155690306000000    00000002    SAVE    AlejandroJCura  201.231.181.174 174-181-231-201.fibertel.com.ar 1140672427.37.17771
         1218483772000000    00000003    SAVE    AlejandroJCura  201.250.38.50   201-250-38-50.speedy.com.ar 1140672427.37.17771
 
-  The data logged is (in this order):
+  The data logged is (in this order, separated by tabs):
 
-    ``DATE``, ``REVISION``, ``ACTION``, ``PAGE``, ``IP``, ``HOST``, ``USER_ID``, ``ATTACHMENTS``, ``LOG_MESSAGE``
+    ``EDITION_TIMESTAMP``, ``REVISION``, ``ACTION``, ``PAGE``, ``IP``, ``HOST``, ``USER_ID``, ``ATTACHMENTS``, ``LOG_MESSAGE``
 
 - The ``USER_ID`` point to a file under the directory ``/data/user`` contained a lot of information related to the user. For example:
 
@@ -147,24 +174,15 @@ An overview of the structure of this tree is this::
 Solving the puzzle
 ------------------
 
-We will use git to handle the *history*, so don't need files to track
-revision nor users: just pages.
+``moin2git.py`` uses git (via the wonderful sh_) to handle the *history*, so don't need multiples files to track differents revision of a page
 
 For instance,  in the root of our target directory (the git repo) we should
 get a file ``AlejandroJCura``:
 
  - 3 revisions (commits), from ``revisions/00000001`` until ``revisions/00000003``
- - the committer name/nickname and email (if available) will be parsed from the user file of each revision. To know who do what revision, we will parse the ``edit-log`` file.
- - The date of each commit will be extracted from the last-modified date of each revision file.
+ - the author name/nickname and email (if available) is parsed from the user file of each revision. To know who and when made what version, ``moin2git.py`` parses the ``edit-log`` file of each page.
 
 We should also get a file ``AlejandroJCura/ClassDecó`` [2]_ where, in this case, ``AlejandroJCura/`` is a directory.
-
-
-What to use
--------------
-
-There are many python wrappers for git libraries. The most promoted is
-pygit2_, wich probably is the faster one (because it's based on libgit2_ library). However, I choose GitPython_ for Waliki_ because it has a higher level API and a pretty useful fallback to git's executables (wrappers via subprocess) for the those deep and obscure corners.
 
 
 
@@ -172,8 +190,6 @@ pygit2_, wich probably is the faster one (because it's based on libgit2_ library
 .. [2] Note we should parse the ugly escaping. ``(2f)`` is ``/`` and determines the left part is a directory. ``(c3b3)`` means ``%C3%B3``, i.e. ``ó``
 
 .. _MoinMoin: http://moinmo.in/
+.. _sh: http://amoffat.github.io/sh
 .. _moin must die: Muerte_a_Moin_Moin_.2BAC8ALw_django-waliki_.3F
-.. _pygit2: http://www.pygit2.org/
-.. _libgit2: http://libgit2.github.com/
-.. _GitPython: https://pythonhosted.org/GitPython/0.3.1/index.html
 .. _Waliki: https://github.com/mgaitan/waliki/
