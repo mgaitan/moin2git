@@ -12,12 +12,16 @@ like Waliki_, Gollum_, Realms_ or similar.
 Install
 -------
 
-::
+.. code-block:: bash
+
     git clone --recursive https://github.com/mgaitan/moin2git.git
     [sudo] pip install -r requirements.txt
 
 If you also want to convert each page to reStructuredPage format,
-(see ``--convert-to-rst``) you will need to install MoinMoin::
+(see ``--convert-to-rst``) you will need to install MoinMoin:
+
+
+.. code-block:: bash
 
     [sudo] pip install moin
 
@@ -25,7 +29,7 @@ If you also want to convert each page to reStructuredPage format,
 Usage
 -----
 
-::
+.. code-block:: bash
 
     tin@morochita:~$ python moin2git.py --help
     moin2git.py
