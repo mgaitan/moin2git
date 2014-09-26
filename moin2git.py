@@ -3,20 +3,21 @@
 
 """moin2git.py
 
-A tool to convert the content of a MoinMoin wiki as a Git repository
+A tool to migrate the content of a MoinMoin wiki to a Git based system
+like Waliki, Gollum or similar.
 
 Usage:
-  moin2git.py --users <data_dir>
-  moin2git.py [--convert] <data_dir> <git_repo>
-
+  moin2git.py migrate <data_dir> <git_repo> [--convert-to-rst]
+  moin2git.py users <data_dir>
+  moin2git.py attachments <data_dir> <dest_dir>
 
 Arguments:
     data_dir  Path where your MoinMoin content are
     git_repo  Path to the target repo (created if it doesn't exist)
+    dest_dir  Path to copy attachments (created if it doesn't exist)
 
 Options:
-    --users         Dump users database as json
-    --convert       After migrate, convert to reStructuredText
+    --convert-to-rst    After migrate, convert to reStructuredText
 """
 from sh import git, python
 import docopt
@@ -25,6 +26,7 @@ import re
 import json
 from datetime import datetime
 from urllib2 import unquote
+import shutil
 
 __version__ = "0.1"
 PACKAGE_ROOT = os.path.abspath(os.path.dirname(__file__))
@@ -88,7 +90,7 @@ def get_versions(page, users=None, data_dir=None, convert=False):
                          'revision': entry[1]})
     if not convert:
         try:
-            convert = arguments['--convert']
+            convert = arguments['--convert-to-rst']
         except NameError:
             convert = False
 
@@ -102,7 +104,7 @@ def get_versions(page, users=None, data_dir=None, convert=False):
     return versions
 
 
-def main():
+def migrate_to_git():
     users = parse_users()
     git_repo = arguments['<git_repo>']
 
@@ -117,16 +119,16 @@ def main():
     for page in pages:
         versions = get_versions(page, users=users)
         if not versions:
-            print "### ignoring %s (no revisions found)" % page
+            print("### ignoring %s (no revisions found)" % page)
             continue
         path = _unquote(page) + '.rst'
-        print "### Creating %s\n" % path
+        print("### Creating %s\n" % path)
         dirname, basename = os.path.split(path)
         if dirname and not os.path.exists(dirname):
             os.makedirs(dirname)
 
         for version in versions:
-            print "revision", version.pop('revision')
+            print("revision %s" % version.pop('revision'))
             with open(path, 'w') as f:
                 f.write(version.pop('content'))
             try:
@@ -135,11 +137,38 @@ def main():
             except:
                 pass
 
+
+def copy_attachments():
+    dest_dir = arguments['<dest_dir>']
+
+    if not os.path.exists(dest_dir):
+        os.makedirs(dest_dir)
+
+    root = os.path.abspath(os.path.join(arguments['<data_dir>'], 'pages'))
+    pages = os.listdir(root)
+    # os.chdir(dest_dir)
+    for page in pages:
+        attachment_dir = os.path.join(root, page, 'attachments')
+        if not os.path.exists(attachment_dir):
+            continue
+        print("Copying attachments for %s" % page)
+        path = _unquote(page)
+        dest_path = os.path.join(dest_dir, path)
+        if not os.path.exists(dest_path):
+            os.makedirs(dest_path)
+        for f in os.listdir(attachment_dir):
+            print(".. %s" % f)
+            full_file_name = os.path.join(attachment_dir, f)
+            shutil.copy(full_file_name, dest_path)
+
+
 if __name__ == '__main__':
 
     arguments = docopt.docopt(__doc__, version=__version__)
 
-    if arguments['--users']:
-        print json.dumps(parse_users(), sort_keys=True, indent=2)
-    else:
-        main()
+    if arguments['users']:
+        print(json.dumps(parse_users(), sort_keys=True, indent=2))
+    elif arguments['migrate']:
+        migrate_to_git()
+    elif arguments['attachments']:
+        copy_attachments()
