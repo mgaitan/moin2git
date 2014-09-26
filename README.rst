@@ -16,6 +16,12 @@ Install
     git clone --recursive https://github.com/mgaitan/moin2git.git
     [sudo] pip install -r requirements.txt
 
+If you also want to convert each page to reStructuredPage format,
+(see ``--convert-to-rst``) you will need to install MoinMoin::
+
+    [sudo] pip install moin
+
+
 Usage
 -----
 
