@@ -19,7 +19,7 @@ Arguments:
 Options:
     --convert-to-rst    After migrate, convert to reStructuredText
 """
-from sh import git, python
+from sh import git, python, ErrorReturnCode_1
 import docopt
 import os
 import re
@@ -97,10 +97,16 @@ def get_versions(page, users=None, data_dir=None, convert=False):
     if convert:
         conversor = os.path.join(PACKAGE_ROOT, "moin2rst", "moin2rst.py")
         basedir = os.path.abspath(os.path.join(data_dir, '..', '..'))
-        rst = python(conversor, _unquote(page), d=basedir)
-        versions.append({'m': 'Converted to reStructuredText via moin2rst',
+        try:
+            rst = python(conversor, _unquote(page), d=basedir)
+
+            versions.append({'m': 'Converted to reStructuredText via moin2rst',
                          'content': rst.stdout,
                          'revision': 'Converting to rst'})
+        except ErrorReturnCode_1:
+            print("Couldn't convert %s to rst" % page)
+
+
     return versions
 
 
