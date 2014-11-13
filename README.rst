@@ -4,6 +4,7 @@ moin2git
 A tool to migrate the content of a MoinMoin wiki to a Git backed wiki engine
 like Waliki_, Gollum_, Realms_ or similar.
 
+
 .. _Waliki: https://github.com/mgaitan/waliki
 .. _Gollum: https://github.com/gollum/gollum
 .. _Realms: https://github.com/scragg0x/realms-wiki
@@ -50,9 +51,23 @@ Usage
     Options:
         --convert-to-rst    After migrate, convert to reStructuredText
 
+Workarounds
+-----------
 
-Dive in
--------
+If you need to convert the markup to rst, you will need a working moinmoin instance.
+For a fast and dirty configuration, put your data in a directory named ``wiki``, and copy ``wikiconfig.py`` in the same level::
+
+
+     wikiconfig.py
+     wiki/
+     ├── data/
+
+
+Then copy ``moin2git/moin2rst/text_x-rst.py`` to ``wiki/data/plugins/formatters/``
+
+
+How it works
+------------
 
 MoinMoin_ is a wiki engine powered by Python that store its content
 (including pages, history of changes and users) as flat files under
