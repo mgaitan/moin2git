@@ -113,11 +113,12 @@ def migrate_to_git():
     if not os.path.exists(os.path.join(git_repo, '.git')):
         git.init(git_repo)
 
-    root = os.path.join(arguments['<data_dir>'], 'pages')
+    data_dir = os.path.abspath(arguments['<data_dir>'])
+    root = os.path.join(data_dir, 'pages')
     pages = os.listdir(root)
     os.chdir(git_repo)
     for page in pages:
-        versions = get_versions(page, users=users)
+        versions = get_versions(page, users=users, data_dir=data_dir)
         if not versions:
             print("### ignoring %s (no revisions found)" % page)
             continue
