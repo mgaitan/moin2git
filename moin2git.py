@@ -49,7 +49,10 @@ def parse_users(data_dir=None):
     users = {}
     users_dir = os.path.join(data_dir, 'user')
     for autor in os.listdir(users_dir):
-        data = open(os.path.join(users_dir, autor)).read()
+        try:
+            data = open(os.path.join(users_dir, autor)).read()
+        except IOError:
+            continue
 
         users[autor] = dict(re.findall(r'^([a-z_]+)=(.*)$', data, flags=re.MULTILINE))
     return users
