@@ -39,7 +39,7 @@ Usage
     like Waliki, Gollum or similar.
 
     Usage:
-      moin2git.py migrate <data_dir> <git_repo> [--convert-to-rst]
+      moin2git.py migrate <data_dir> <git_repo> [--convert-to-rst] [--users-file <users_file>]
       moin2git.py users <data_dir>
       moin2git.py attachments <data_dir> <dest_dir>
 
@@ -50,6 +50,7 @@ Usage
 
     Options:
         --convert-to-rst    After migrate, convert to reStructuredText
+        --users-file        Use users_file to map wiki user to git commit author
 
 Workarounds
 -----------
@@ -209,6 +210,14 @@ get a file ``AlejandroJCura``:
 
 We should also get a file ``AlejandroJCura/ClassDecó`` [2]_ where, in this case, ``AlejandroJCura/`` is a directory.
 
+Commit authors
+--------------
+
+The option --users-file acepts a file that will be used to map wiki users
+to git commit authors.
+
+The output of the command ``moin2git.py users <data_dir>`` can be used
+as input. For each users the required fields are ``name`` and ``email``.
 
 
 .. [1] http://python.org.ar/AlejandroJCura/ClassDec%C3%B3

@@ -7,7 +7,7 @@ A tool to migrate the content of a MoinMoin wiki to a Git based system
 like Waliki, Gollum or similar.
 
 Usage:
-  moin2git.py migrate <data_dir> <git_repo> [--convert-to-rst]
+  moin2git.py migrate <data_dir> <git_repo> [--convert-to-rst] [--users-file <users_file>]
   moin2git.py users <data_dir>
   moin2git.py attachments <data_dir> <dest_dir>
 
@@ -18,6 +18,7 @@ Arguments:
 
 Options:
     --convert-to-rst    After migrate, convert to reStructuredText
+    --users-file        Use users_file to map wiki user to git commit author
 """
 from sh import git, python, ErrorReturnCode_1
 import docopt
@@ -114,7 +115,10 @@ def get_versions(page, users=None, data_dir=None, convert=False):
 
 
 def migrate_to_git():
-    users = parse_users()
+    if arguments['--users-file']:
+        users = json.loads(open(arguments['<users_file>']).read())
+    else:
+        users = parse_users()
     git_repo = arguments['<git_repo>']
 
     if not os.path.exists(git_repo):
